@@ -37,7 +37,7 @@ class Keyrecord
 
 	/**
 	 * Haal een Keyrecord op uit de DB via de sleutel.
-	 * Geeft leeg object terug als niet gevonden.
+	 * Geeft null terug als niet gevonden.
 	 */
 	public static function fromSleutel(PDO $connection, string $sleutel): ?self
 	{

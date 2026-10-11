@@ -2,6 +2,7 @@
 abstract class person
 {
   protected $person_id;
+  protected $id_person;	// wordt gezet in saveToDB(); declareren voorkomt een "dynamische eigenschap" (PHP 8.2+)
   protected $delind;
   protected $id_user_modified;
   protected $datetime_created;

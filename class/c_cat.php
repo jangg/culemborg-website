@@ -12,7 +12,7 @@ class Categorie
 		$this->id = NULL;
 		$this->naam = '';
 		$this->omschrijving = '';
-		$this->nbrTopcs = 0;
+		$this->nbrTopics = 0;	// was nbrTopcs (tikfout: maakte in PHP 8.2+ een "dynamische eigenschap")
 		$this->nbrPosts = 0;
 		
         $a = func_get_args(); 

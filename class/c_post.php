@@ -187,11 +187,17 @@ class Post
 	contains more words than $wordsreturned, the entire string
 	is returned.*/
 	{
-		$array = explode(" ", $this->tekst);
+		// okt 2026: eerst de HTML eruit halen. Anders kon het afknippen midden in een
+		// tag vallen (bijv. "<span style=...") en klopte de opmaak van de pagina niet meer.
+		// De aanroeper moet het resultaat met h() tonen: het is nu gewone tekst.
+		$tekst = str_replace(['<br>', '<br/>', '<br />', '</p>', '</div>', '</li>'], ' ', (string)$this->tekst);
+		$tekst = html_entity_decode(strip_tags($tekst), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$tekst = trim(preg_replace('/\s+/u', ' ', $tekst));
+		$array = explode(" ", $tekst);
 		/*  Already short enough, return the whole thing*/
 		if (count($array) <= $wordsreturned)
 		{
-			$retval = $this->tekst;
+			$retval = $tekst;
 		}
 		/*  Need to chop of some words*/
 		else

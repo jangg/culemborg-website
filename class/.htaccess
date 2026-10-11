@@ -1,0 +1,13 @@
+# ------------------------------------------------------------------
+# Deze map is alleen voor PHP zelf (include/require).
+# Een browser mag hier niets openen: elk verzoek krijgt "403 Forbidden".
+# PHP kan de bestanden gewoon blijven lezen, want dat gaat via het
+# bestandssysteem en niet via de webserver.
+# ------------------------------------------------------------------
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>
