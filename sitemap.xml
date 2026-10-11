@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepagina -->
+  <url>
+	<loc>https://jobhulpculemborg.nl/</loc>
+	<lastmod>2026-03-31</lastmod>
+	<changefreq>weekly</changefreq>
+	<priority>1.0</priority>
+  </url>
+
+  <!-- Nieuws / Actueel -->
+  <url>
+	<loc>https://jobhulpculemborg.nl/nieuws/</loc>
+	<lastmod>2026-03-31</lastmod>
+	<changefreq>weekly</changefreq>
+	<priority>0.8</priority>
+  </url>
+
+  <!-- Over ons / Contact -->
+  <url>
+	<loc>https://jobhulpculemborg.nl/stichting.php</loc>
+	<lastmod>2026-03-31</lastmod>
+	<changefreq>monthly</changefreq>
+	<priority>0.7</priority>
+  </url>
+
+  <!-- Aanmelden / Registreren -->
+  <!-- <url>
+	<loc>https://jobhulpculemborg.nl/aanmelden/</loc>
+	<lastmod>2026-03-31</lastmod>
+	<changefreq>monthly</changefreq>
+	<priority>0.8</priority>
+  </url> -->
+
+</urlset>

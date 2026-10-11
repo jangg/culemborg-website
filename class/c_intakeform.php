@@ -1,0 +1,559 @@
+<?php
+class Intakeform
+{
+	protected $id					;			
+	protected $id_werkzkd			;	
+	protected $roepnaam				;			
+	protected $gebplaats			;			
+	protected $gebland				;			
+	protected $nationaliteit		;
+	protected $legitimatieind		;
+	protected $relatie				;	
+	protected $volw_kind			;			
+	protected $partner_beroep		;		
+	protected $aanmelding			;
+	protected $bron					;
+	protected $regeling				;	
+	protected $uitdagingen 			;			
+	protected $beperking			;
+	protected $finsituatie			;
+	protected $redenen				;			
+	protected $motivatie			;			
+	protected $eisen				;			
+	protected $netwerken			;		
+	protected $andere_hulp			;		
+	protected $CVind				;	
+	protected $diploma				;			
+	protected $studie				;			
+	protected $werkervaring			;
+	protected $werk_gewenst			;		
+	protected $voorwaarden			;	
+	protected $taalbeh				;
+	protected $taalbeh_schr			;	
+	protected $reistijd				;			
+	protected $vervoer				;			
+	protected $werkbijzh			;
+	protected $id_intaker			;		
+	protected $overige_opm			;
+	protected $besprmis				;
+	protected $besprtkn				;
+	protected $besprvwk				;
+	protected $besprprv				;
+	protected $besprstatgeld		;
+	protected $besprkopie_ao		;
+	protected $besprvrijwbijd		;		
+	protected $akkoord_datum		;
+	protected $akkoord_plaats		;		
+	protected $akkoord_naam			;	
+	protected $akkoord_handtek		;
+	protected $advjobgroup			;
+	protected $advmaatje			;
+	protected $advnietontv			;
+	protected $advopmerkingen		;
+	protected $advverwdatum			;
+		
+	public function __construct () 
+	{
+		$this->id					= NULL;
+		$this->id_werkzkd			= NULL;
+		$this->roepnaam				= '';
+		$this->gebplaats			= '';
+		$this->gebland				= '';
+		$this->nationaliteit		= '';
+		$this->legitimatieind		= '';
+		$this->relatie				= '';
+		$this->volw_kind			= '';
+		$this->partner_beroep		= '';
+		$this->aanmelding			= '';
+		$this->bron					= '';
+		$this->regeling				= '';
+		$this->uitdagingen 			= '';
+		$this->beperking			= '';
+		$this->finsituatie			= '';
+		$this->redenen				= '';
+		$this->motivatie			= '';
+		$this->eisen				= '';
+		$this->netwerken			= '';
+		$this->andere_hulp			= '';
+		$this->CVind				= '';
+		$this->diploma				= '';
+		$this->studie				= '';
+		$this->werkervaring			= '';
+		$this->werk_gewenst			= '';
+		$this->voorwaarden			= '';
+		$this->taalbeh				= '';
+		$this->taalbeh_schr			= '';
+		$this->reistijd				= '';
+		$this->vervoer				= '';
+		$this->werkbijzh			= '';
+		$this->id_intaker			= NULL;
+		$this->overige_opm			= '';
+		$this->besprmis				= '';
+		$this->besprtkn				= '';
+		$this->besprvwk				= '';
+		$this->besprprv				= '';
+		$this->besprstatgeld		= '';
+		$this->besprkopie_ao		= '';
+		$this->besprvrijwbijd		= '';
+		$this->akkoord_datum		= '';
+		$this->akkoord_plaats		= '';
+		$this->akkoord_naam			= '';
+		$this->akkoord_handtek		= '';
+		$this->advjobgroup			= '';
+		$this->advmaatje			= '';
+		$this->advnietontv			= '';
+		$this->advopmerkingen			= '';
+		$this->advverwdatum			= '';	
+		
+		$a = func_get_args(); 
+		$i = func_num_args(); 
+		if (method_exists($this,$f='__construct'.$i)) 
+		{ 
+			call_user_func_array(array($this,$f),$a); 
+		}
+	
+    }
+     	
+	public function __construct1 ($intakeformrow) 
+	{
+		if ($intakeformrow)
+		{
+// 			error_log("Intakeform bestaat, invullen maar");
+			$this->id					= $intakeformrow['id'];
+			$this->id_werkzkd			= $intakeformrow['id_werkzkd'];
+			$this->roepnaam				= $intakeformrow['roepnaam'];
+			$this->gebplaats			= $intakeformrow['gebplaats'];
+			$this->gebland				= $intakeformrow['gebland'];
+			$this->nationaliteit		= $intakeformrow['nationaliteit'];
+			$this->legitimatieind		= $intakeformrow['legitimatieind'];
+			$this->relatie				= $intakeformrow['relatie'];
+			$this->volw_kind			= $intakeformrow['volw_kind'];
+			$this->partner_beroep		= $intakeformrow['partner_beroep'];
+			$this->aanmelding			= $intakeformrow['aanmelding'];
+			$this->bron					= $intakeformrow['bron'];
+			$this->regeling				= $intakeformrow['regeling'];
+			$this->uitdagingen 			= $intakeformrow['uitdagingen'];
+			$this->beperking			= $intakeformrow['beperking'];
+			$this->finsituatie			= $intakeformrow['finsituatie'];
+			$this->redenen				= $intakeformrow['redenen'];
+			$this->motivatie			= $intakeformrow['motivatie'];
+			$this->eisen				= $intakeformrow['eisen'];
+			$this->netwerken			= $intakeformrow['netwerken'];
+			$this->andere_hulp			= $intakeformrow['andere_hulp'];
+			$this->CVind				= $intakeformrow['CVind'];
+			$this->diploma				= $intakeformrow['diploma'];
+			$this->studie				= $intakeformrow['studie'];
+			$this->werkervaring			= $intakeformrow['werkervaring'];
+			$this->werk_gewenst			= $intakeformrow['werk_gewenst'];
+			$this->voorwaarden			= $intakeformrow['voorwaarden'];
+			$this->taalbeh				= $intakeformrow['taalbeh'];
+			$this->taalbeh_schr			= $intakeformrow['taalbeh_schr'];
+			$this->reistijd				= $intakeformrow['reistijd'];
+			$this->vervoer				= $intakeformrow['vervoer'];
+			$this->werkbijzh			= $intakeformrow['werkbijzh'];
+			$this->id_intaker			= $intakeformrow['id_intaker'];
+			$this->overige_opm			= $intakeformrow['overige_opm'];
+			$this->besprmis				= $intakeformrow['besprmis'];
+			$this->besprtkn				= $intakeformrow['besprtkn'];
+			$this->besprvwk				= $intakeformrow['besprvwk'];
+			$this->besprprv				= $intakeformrow['besprprv'];
+			$this->besprstatgeld		= $intakeformrow['besprstatgeld'];
+			$this->besprkopie_ao		= $intakeformrow['besprkopie_ao'];
+			$this->besprvrijwbijd		= $intakeformrow['besprvrijwbijd'];
+			$this->akkoord_datum		= $intakeformrow['akkoord_datum'];
+			$this->akkoord_plaats		= $intakeformrow['akkoord_plaats'];
+			$this->akkoord_naam			= $intakeformrow['akkoord_naam'];
+			$this->akkoord_handtek		= $intakeformrow['akkoord_handtek'];
+			$this->advjobgroup			= $intakeformrow['advjobgroup'];
+			$this->advmaatje			= $intakeformrow['advmaatje'];
+			$this->advnietontv			= $intakeformrow['advnietontv'];
+			$this->advopmerkingen		= $intakeformrow['advopmerkingen'];
+			$this->advverwdatum			= $intakeformrow['advverwdatum'];
+		}
+	}
+
+	public function __construct2 ($attr, $value)
+	{
+		/* id, gebruikersnaam of emailadres is bekend, haal op uit DB */
+		switch ($attr)
+		{
+			case 'id':
+				$this->__construct1($this->readIntakeformWithId($value));
+				break;
+			default:
+				return FALSE;
+		}
+		
+	}
+
+	public function __destruct ()
+	{
+		// 
+		// error_log('person ' . $this->id . ' is vernietigd');
+	}
+	
+	public function __get($attr)
+	{
+		return $this->$attr;
+	}
+
+	public function __set($attr, $value)
+	{
+		/* hier moet nog wel per attr de value worden gechecked */
+		$this->$attr = $value;
+	}
+	
+	public function __toString()
+	{
+		/* hier printen we het object mee uit, voor testdoeleinden */
+		return '';
+			// '$person_id			: ' . $this->person_id	. '<br/>' .
+			// '$delind			: ' . $this->delind		. '<br/>' .
+			// 'datetime_created	: ' . $this->datetime_created		. '<br/>' .
+			// '$datetime_modified	: ' . $this->datetime_modified		. '<br/>' .
+			// '$voornaam			: ' . $this->voornaam		. '<br/>' .
+			// '$tussenvoegsels	: ' . $this->tussenvoegsels	. '<br/>' .
+			// '$achternaam		: ' . $this->achternaam	. '<br/>' .
+			// '$straat            : ' . $this->straat . '<br/>' .
+			// '$huisnummer        : ' . $this->huisnummer . '<br/>' .
+			// '$postcode          : ' . $this->postcode . '<br/>' .
+			// '$woonplaats        : ' . $this->woonplaats . '<br/>' .
+			// '$emailadres        : ' . $this->emailadres	. '<br/>' .
+			// '$telefoonnr		: ' . $this->telefoonnr	. '<br/>' .
+			// '$type				: ' . $this->type			. '<br/>' .
+			// '$picfile			: ' . $this->picfile		. '<br/>' .
+			// '$link_linkedin		: ' . $this->link_linkedin	. '<br/>' .
+			// '$presentInd		: ' . $this->presentInd	. '<br/>';
+
+	}
+	
+	public function saveToDB ($id_werkzkd) 
+	{
+		if (empty($id_werkzkd))
+			return FALSE;
+		$this->id_werkzkd = $id_werkzkd;
+		global $connection;
+		try
+		{	
+			// $date = new DateTime();
+			// $this->datetime_created = $date->format('Y-m-d H:i:s');
+			// $this->datetime_modified = $date->format('Y-m-d H:i:s');
+		
+			$sql = "INSERT intakeform 
+						(	
+							id				,
+							id_werkzkd		,
+							roepnaam		,	
+							gebplaats		,
+							gebland			,
+							nationaliteit	,
+							legitimatieind	,
+							relatie			,
+							volw_kind		,
+							partner_beroep	,
+							aanmelding		,
+							bron			,	
+							regeling		,	
+							uitdagingen 	,	
+							beperking		,
+							finsituatie		,
+							redenen			,
+							motivatie		,
+							eisen			,
+							netwerken		,
+							andere_hulp		,
+							CVind			,
+							diploma			,
+							studie			,
+							werkervaring	,	
+							werk_gewenst	,	
+							voorwaarden		,
+							taalbeh			,
+							taalbeh_schr	,	
+							reistijd		,	
+							vervoer			,
+							werkbijzh		,
+							id_intaker		,
+							overige_opm		,
+							besprmis		,	
+							besprtkn		,	
+							besprvwk		,	
+							besprprv		,	
+							besprstatgeld	,
+							besprkopie_ao	,
+							besprvrijwbijd	,
+							akkoord_datum	,
+							akkoord_plaats	,
+							akkoord_naam	,	
+							akkoord_handtek	,
+							advjobgroup		,
+							advmaatje		,
+							advnietontv		,
+							advopmerkingen		,
+							advverwdatum
+						)
+					VALUES 
+						(
+							:id				,
+							:id_werkzkd		,
+							:roepnaam		,	
+							:gebplaats		,
+							:gebland			,
+							:nationaliteit	,
+							:legitimatieind	,
+							:relatie			,
+							:volw_kind		,
+							:partner_beroep	,
+							:aanmelding		,
+							:bron			,	
+							:regeling		,	
+							:uitdagingen 	,	
+							:beperking		,
+							:finsituatie		,
+							:redenen			,
+							:motivatie		,
+							:eisen			,
+							:netwerken		,
+							:andere_hulp		,
+							:CVind			,
+							:diploma			,
+							:studie			,
+							:werkervaring	,	
+							:werk_gewenst	,	
+							:voorwaarden		,
+							:taalbeh			,
+							:taalbeh_schr	,	
+							:reistijd		,	
+							:vervoer			,
+							:werkbijzh		,
+							:id_intaker		,
+							:overige_opm		,
+							:besprmis		,	
+							:besprtkn		,	
+							:besprvwk		,	
+							:besprprv		,	
+							:besprstatgeld	,
+							:besprkopie_ao	,
+							:besprvrijwbijd	,
+							:akkoord_datum	,
+							:akkoord_plaats	,
+							:akkoord_naam	,	
+							:akkoord_handtek	,
+							:advjobgroup		,
+							:advmaatje		,
+							:advnietontv		,
+							:advopmerkingen		,
+							:advverwdatum							
+						);";
+		
+			
+			$stmt = $connection->prepare( $sql );
+			
+			$stmt->bindvalue(":id"					, NULL, PDO::PARAM_STR);
+			$stmt->bindvalue(":id_werkzkd"		, $this->id_werkzkd, PDO::PARAM_STR);
+			$stmt->bindvalue(":roepnaam"			, $this->roepnaam, PDO::PARAM_STR);
+			$stmt->bindvalue(":gebplaats"			, $this->gebplaats, PDO::PARAM_STR);
+			$stmt->bindvalue(":gebland"			, $this->gebland, PDO::PARAM_STR);
+			$stmt->bindvalue(":nationaliteit"	, $this->nationaliteit, PDO::PARAM_STR);
+			$stmt->bindvalue(":legitimatieind"	, $this->legitimatieind, PDO::PARAM_STR);
+			$stmt->bindvalue(":relatie"			, $this->relatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":volw_kind"			, $this->volw_kind, PDO::PARAM_STR);
+			$stmt->bindvalue(":partner_beroep"	, $this->partner_beroep, PDO::PARAM_STR);
+			$stmt->bindvalue(":aanmelding"		, $this->aanmelding, PDO::PARAM_STR);
+			$stmt->bindvalue(":bron"				, $this->bron, PDO::PARAM_STR);
+			$stmt->bindvalue(":regeling"			, $this->regeling, PDO::PARAM_STR);
+			$stmt->bindvalue(":uitdagingen"		, $this->uitdagingen, PDO::PARAM_STR);
+			$stmt->bindvalue(":beperking"			, $this->beperking, PDO::PARAM_STR);
+			$stmt->bindvalue(":finsituatie"		, $this->finsituatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":redenen"			, $this->redenen, PDO::PARAM_STR);
+			$stmt->bindvalue(":motivatie"			, $this->motivatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":eisen"				, $this->eisen, PDO::PARAM_STR);
+			$stmt->bindvalue(":netwerken"			, $this->netwerken, PDO::PARAM_STR);
+			$stmt->bindvalue(":andere_hulp"		, $this->andere_hulp, PDO::PARAM_STR);
+			$stmt->bindvalue(":CVind"				, $this->CVind, PDO::PARAM_STR);
+			$stmt->bindvalue(":diploma"			, $this->diploma, PDO::PARAM_STR);
+			$stmt->bindvalue(":studie"				, $this->studie, PDO::PARAM_STR);
+			$stmt->bindvalue(":werkervaring"		, $this->werkervaring, PDO::PARAM_STR);
+			$stmt->bindvalue(":werk_gewenst"		, $this->werk_gewenst, PDO::PARAM_STR);
+			$stmt->bindvalue(":voorwaarden"		, $this->voorwaarden, PDO::PARAM_STR);
+			$stmt->bindvalue(":taalbeh"			, $this->taalbeh, PDO::PARAM_STR);
+			$stmt->bindvalue(":taalbeh_schr"		, $this->taalbeh_schr, PDO::PARAM_STR);
+			$stmt->bindvalue(":reistijd"			, $this->reistijd, PDO::PARAM_STR);
+			$stmt->bindvalue(":vervoer"			, $this->vervoer, PDO::PARAM_STR);
+			$stmt->bindvalue(":werkbijzh"			, $this->werkbijzh, PDO::PARAM_STR);
+			$stmt->bindvalue(":id_intaker"		, $this->id_intaker, PDO::PARAM_STR);
+			$stmt->bindvalue(":overige_opm"		, $this->overige_opm, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprmis"			, $this->besprmis, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprtkn"			, $this->besprtkn, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprvwk"			, $this->besprvwk, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprprv"			, $this->besprprv, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprstatgeld"	, $this->besprstatgeld, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprkopie_ao"	, $this->besprkopie_ao, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprvrijwbijd"	, $this->besprvrijwbijd, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_datum"	, $this->akkoord_datum, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_plaats"	, $this->akkoord_plaats, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_naam"		, $this->akkoord_naam, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_handtek" , $this->akkoord_handtek, PDO::PARAM_STR);
+			$stmt->bindvalue(":advjobgroup"		, $this->advjobgroup, PDO::PARAM_STR);
+			$stmt->bindvalue(":advmaatje"			, $this->advmaatje, PDO::PARAM_STR);
+			$stmt->bindvalue(":advnietontv"		, $this->advnietontv, PDO::PARAM_STR);
+			$stmt->bindvalue(":advopmerkingen"	, $this->advopmerkingen, PDO::PARAM_STR);
+			$stmt->bindvalue(":advverwdatum"    , $this->advverwdatum, PDO::PARAM_STR);
+
+			
+			$stmt->execute();
+// 			error_log('Een nieuwe c_intakeform is toegevoegd');
+			$this->id = $connection->lastInsertId();
+		}
+		catch (PDOException $e) 
+		{
+			  error_log('Connectie (intakeform 1) met de database mislukt: ' . $e->getMessage());
+			  return FALSE;
+		}
+	    return TRUE;	
+	}
+
+	public function updateToDB () 
+	{
+		global $connection;
+		try
+		{
+			// $date = new DateTime();
+			// $this->datetime_modified = $date->format('Y-m-d H:i:s');
+
+			$sql = "UPDATE intakeform SET
+					roepnaam		 =	:roepnaam		,
+					gebplaats		 =	:gebplaats	,
+					gebland			 =	:gebland		,
+					nationaliteit	 =	:nationaliteit	,
+					legitimatieind 	=	:legitimatieind,
+					relatie		 	=	:relatie		,
+					volw_kind		 =	:volw_kind	,
+					partner_beroep	 =	:partner_beroep,
+					aanmelding	 	=	:aanmelding	,
+					bron			 =	:bron			,
+					regeling		 =	:regeling		,
+					uitdagingen	 	=	:uitdagingen	,
+					beperking		 =	:beperking		,
+					finsituatie		 =	:finsituatie		,
+					redenen		 	=	:redenen		,
+					motivatie		 =	:motivatie		,
+					eisen			 =	:eisen			,
+					netwerken		 =	:netwerken		,
+					andere_hulp	 	=	:andere_hulp	,
+					CVind			 =	:CVind			,
+					diploma		 	=	:diploma		,
+					studie		 	=	:studie		,
+					werkervaring	 =	:werkervaring	,
+					werk_gewenst	 =	:werk_gewenst	,
+					voorwaarden	 	=	:voorwaarden	,
+					taalbeh			=	:taalbeh		,
+					taalbeh_schr	 =	:taalbeh_schr	,
+					reistijd		 =	:reistijd		,
+					vervoer		 	=	:vervoer		,
+					werkbijzh	 	=	:werkbijzh	,
+					id_intaker	 	=	:id_intaker	,
+					overige_opm	 	=	:overige_opm	,
+					besprmis		 =	:besprmis		,
+					besprtkn		 =	:besprtkn		,
+					besprvwk		 =	:besprvwk		,
+					besprprv		 =	:besprprv		,
+					besprstatgeld 	=	:besprstatgeld,
+					besprkopie_ao	 =	:besprkopie_ao	,
+					besprvrijwbijd 	=	:besprvrijwbijd,
+					akkoord_datum	 =	:akkoord_datum	,
+					akkoord_plaats 	=	:akkoord_plaats,
+					akkoord_naam	 =	:akkoord_naam	,
+					akkoord_handtek =	:akkoord_handtek,
+					advjobgroup 	=	:advjobgroup,
+					advmaatje		 =	:advmaatje		,
+					advnietontv	 	=	:advnietontv	,
+					advopmerkingen 	=	:advopmerkingen,
+					advverwdatum   	=	:advverwdatum  
+					WHERE id = :id;";
+			// error_log($sql);
+			$stmt = $connection->prepare( $sql );
+			$stmt->bindvalue(":id"					, $this->id, PDO::PARAM_STR);
+			// $stmt->bindvalue(":id_werkzkd"		, $this->id_werkzkd, PDO::PARAM_STR);
+			$stmt->bindvalue(":roepnaam"			, $this->roepnaam, PDO::PARAM_STR);
+			$stmt->bindvalue(":gebplaats"			, $this->gebplaats, PDO::PARAM_STR);
+		$stmt->bindvalue(":gebland"				, $this->gebland, PDO::PARAM_STR);
+			$stmt->bindvalue(":nationaliteit"	, $this->nationaliteit, PDO::PARAM_STR);
+			$stmt->bindvalue(":legitimatieind"	, $this->legitimatieind, PDO::PARAM_STR);
+			$stmt->bindvalue(":relatie"			, $this->relatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":volw_kind"			, $this->volw_kind, PDO::PARAM_STR);
+			$stmt->bindvalue(":partner_beroep"	, $this->partner_beroep, PDO::PARAM_STR);
+			$stmt->bindvalue(":aanmelding"		, $this->aanmelding, PDO::PARAM_STR);
+			$stmt->bindvalue(":bron"				, $this->bron, PDO::PARAM_STR);
+			$stmt->bindvalue(":regeling"			, $this->regeling, PDO::PARAM_STR);
+		$stmt->bindvalue(":uitdagingen"			, $this->uitdagingen, PDO::PARAM_STR);
+			$stmt->bindvalue(":beperking"			, $this->beperking, PDO::PARAM_STR);
+			$stmt->bindvalue(":finsituatie"		, $this->finsituatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":redenen"			, $this->redenen, PDO::PARAM_STR);
+			$stmt->bindvalue(":motivatie"			, $this->motivatie, PDO::PARAM_STR);
+			$stmt->bindvalue(":eisen"				, $this->eisen, PDO::PARAM_STR);
+			$stmt->bindvalue(":netwerken"			, $this->netwerken, PDO::PARAM_STR);
+			$stmt->bindvalue(":andere_hulp"		, $this->andere_hulp, PDO::PARAM_STR);
+			$stmt->bindvalue(":CVind"				, $this->CVind, PDO::PARAM_STR);
+			$stmt->bindvalue(":diploma"			, $this->diploma, PDO::PARAM_STR);
+			$stmt->bindvalue(":studie"				, $this->studie, PDO::PARAM_STR);
+			$stmt->bindvalue(":werkervaring"		, $this->werkervaring, PDO::PARAM_STR);
+			$stmt->bindvalue(":werk_gewenst"		, $this->werk_gewenst, PDO::PARAM_STR);
+			$stmt->bindvalue(":voorwaarden"		, $this->voorwaarden, PDO::PARAM_STR);
+			$stmt->bindvalue(":taalbeh"			, $this->taalbeh, PDO::PARAM_STR);
+			$stmt->bindvalue(":taalbeh_schr"		, $this->taalbeh_schr, PDO::PARAM_STR);
+			$stmt->bindvalue(":reistijd"			, $this->reistijd, PDO::PARAM_STR);
+			$stmt->bindvalue(":vervoer"			, $this->vervoer, PDO::PARAM_STR);
+			$stmt->bindvalue(":werkbijzh"			, $this->werkbijzh, PDO::PARAM_STR);
+			$stmt->bindvalue(":id_intaker"		, $this->id_intaker, PDO::PARAM_STR);
+			$stmt->bindvalue(":overige_opm"		, $this->overige_opm, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprmis"			, $this->besprmis, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprtkn"			, $this->besprtkn, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprvwk"			, $this->besprvwk, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprprv"			, $this->besprprv, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprstatgeld"	, $this->besprstatgeld, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprkopie_ao"	, $this->besprkopie_ao, PDO::PARAM_STR);
+			$stmt->bindvalue(":besprvrijwbijd"	, $this->besprvrijwbijd, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_datum"	, $this->akkoord_datum, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_plaats"	, $this->akkoord_plaats, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_naam"		, $this->akkoord_naam, PDO::PARAM_STR);
+			$stmt->bindvalue(":akkoord_handtek" , $this->akkoord_handtek, PDO::PARAM_STR);
+			$stmt->bindvalue(":advjobgroup"		, $this->advjobgroup, PDO::PARAM_STR);
+			$stmt->bindvalue(":advmaatje"			, $this->advmaatje, PDO::PARAM_STR);
+			$stmt->bindvalue(":advnietontv"		, $this->advnietontv, PDO::PARAM_STR);
+			$stmt->bindvalue(":advopmerkingen"	, $this->advopmerkingen, PDO::PARAM_STR);
+			$stmt->bindvalue(":advverwdatum"    , $this->advverwdatum, PDO::PARAM_STR);
+
+			$stmt->execute();
+			
+		}
+		catch (PDOException $e) 
+		{
+			  error_log('Connectie (intakeform 5) met de database mislukt: ' . $e->getMessage());
+			  return FALSE;
+		}
+	    return TRUE;	
+	}
+	public function readIntakeformWithId ($attr)
+	{
+		global $connection;
+		try
+		{
+			openDB();
+			$sql = "SELECT intakeform.* FROM intakeform WHERE intakeform.id = :id;";
+			
+			$stmt = $connection->prepare( $sql );
+			$stmt->bindValue( ":id", $attr, PDO::PARAM_STR);
+	//			echo $sql . '<br/>';
+			$stmt->execute();
+			$intakeformrow = $stmt->fetch(PDO::FETCH_ASSOC);
+		}
+		catch (PDOException $e) 
+		{
+			  error_log('Connectie (intakeform 1) met de database mislukt: ' . $e->getMessage());
+			  return FALSE;
+		}
+		return $intakeformrow;	
+	}
+
+}

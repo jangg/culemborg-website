@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Admin en besloten mappen niet indexeren
+Disallow: /assets/
+Disallow: /class/
+Disallow: /includes/
+Disallow: /logs/
+Disallow: /PHPmailer/
+
+# Sitemap locatie doorgeven aan Google
+Sitemap: https://jobhulpculemborg.nl/sitemap.xml
