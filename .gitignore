@@ -15,3 +15,6 @@ logos/
 docs/
 assets/
 js/
+
+# Instellingen van het losse aanmeldformulier (t-aanmelden.php): bevat het SMTP-wachtwoord
+includes/t-config.php
