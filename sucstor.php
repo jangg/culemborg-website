@@ -35,7 +35,7 @@ define('SUCSTOR_VOORBEELD', false);
  *   tekst_knop          tekst op de knop; leeg = geen knop
  *   link_knop           doel van de knop (externe URL); leeg = geen knop
  *   datetime_pub_extern publicatiedatum (jjjj-mm-dd uu:mm:ss)
- *   picfile1            bestandsnaam van de foto in /img/sucstor/
+ *   picfile1            bestandsnaam van de foto in /imgsucstor/
  * ---------------------------------------------------------------------- */
 
 $sucstorRows = [
