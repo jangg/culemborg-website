@@ -20,10 +20,14 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 // Opmaak
 // ---------------------------------------------------------------------------
 
-/** Veilig weergeven in HTML. */
-function h($tekst)
-{
-    return htmlspecialchars((string) $tekst, ENT_QUOTES, 'UTF-8');
+/** Veilig weergeven in HTML.
+ *  config.php van de site definieert h() ook (okt 2026); dan wordt die gebruikt.
+ *  Zonder deze controle stopt PHP met "Cannot redeclare h()". */
+if (!function_exists('h')) {
+    function h($tekst)
+    {
+        return htmlspecialchars((string) $tekst, ENT_QUOTES, 'UTF-8');
+    }
 }
 
 /** Bijvoorbeeld: donderdag 24 september 2026, 19.30 - 21.30 uur */
