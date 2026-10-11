@@ -1,3 +1,4 @@
+<?php include_once 'config.php'; // nodig voor LOC_NAME in head.php (PHP 8: anders een fatale fout) ?>
 <!DOCTYPE HTML>
 <html lang="nl-NL">
 	<head>
