@@ -17,8 +17,8 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	$message = 'Beste ' . $arr['am_voornaam'] . ' ' . $arr['am_tussenvoegsels'] . ' ' . $arr['am_achternaam'] . "<br/><br/>";
 	$message .= 'Je hebt je aangemeld voor de partnerbijeenkomst op 16 juni a.s.' . "<br/><br/>";
 	$message .= 'Emailadres      : ' . $arr['am_emailadres'] . '<br/>';
-	$message .= 'Aantal peronen  : ' . $arr['am_aantal'] . '<br/><br/>';
-	$message .= "<br/><br/>" . 'Dank voor de aanmelding en tot donderdag 16 juni 15:00h';
+	$message .= 'Aantal personen : ' . $arr['am_aantal'] . '<br/><br/>';
+	$message .= "<br/><br/>" . 'Dank voor de aanmelding en tot donderdag 15 oktober 15:00h';
 	$message .= "<br/><br/>" . 'Met vriendelijke groeten,';
 	$message .= "<br/>" . LOC_NAME;
 
