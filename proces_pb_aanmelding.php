@@ -15,7 +15,7 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 {
 	/* Eerst een email naar de aanmelder */
 	$message = 'Beste ' . $arr['am_voornaam'] . ' ' . $arr['am_tussenvoegsels'] . ' ' . $arr['am_achternaam'] . "<br/><br/>";
-	$message .= 'Je hebt je aangemeld voor de partnerbijeenkomst op 16 juni a.s.' . "<br/><br/>";
+	$message .= 'Je hebt je aangemeld voor de partnerbijeenkomst op 15 oktober a.s.' . "<br/><br/>";
 	$message .= 'Emailadres      : ' . $arr['am_emailadres'] . '<br/>';
 	$message .= 'Aantal personen : ' . $arr['am_aantal'] . '<br/><br/>';
 	$message .= "<br/><br/>" . 'Dank voor de aanmelding en tot donderdag 15 oktober 15:00h';

@@ -3,9 +3,9 @@
  <div class="container" data-aos="zoom-out" data-aos-delay="100" style="z-index: 3;">
 	 <!-- <div class=""></div> -->
 	 <div>
-		<h1 class="col-lg-12 d-none d-xl-block my-4" style="font-size: 2em;">Partners van <?= LOC_NAME ?> praten samen over de toekomst op 16 juni</h1>
+		<h1 class="col-lg-12 d-none d-xl-block my-4" style="font-size: 2em;">Partners van <?= LOC_NAME ?> praten samen over de toekomst op 15 oktober</h1>
 		<h1 class="col-lg-12 d-none d-xl-block my-4" style="font-size: 4em;">Welkom bij <span><?= LOC_NAME ?></span></h1>
-		<h1 class="col-lg-12 d-xl-none my-1" style="font-size: 2em;">Partners van <?= LOC_NAME ?> praten samen over de toekomst op 16 juni</h1>
+		<h1 class="col-lg-12 d-xl-none my-1" style="font-size: 2em;">Partners van <?= LOC_NAME ?> praten samen over de toekomst op 15 oktober</h1>
 		<h1 class="col-lg-12 d-xl-none my-1" style="font-size: 2em;">Welkom bij <span><?= LOC_NAME ?></span></h1>
 		<h2 class="my-5">Alleen samen helpen wij de samenleving vooruit!</h2>
 		<div class="d-flex">

@@ -168,7 +168,7 @@ if (isset($_SESSION['result']))
                 <div class="container-fluid titelbalk py-5">
                     <div class="row justify-content-center">
                         <div class="col-xl-6" style="z-index: 3;">
-                            <h4 class="text-center text-light display-2" style="text-shadow: 3px 3px 8px #1d423e;">Ik kom<br/>naar de partnerbijeenkomst<br/>op 16 juni</h4>
+                            <h4 class="text-center text-light display-2" style="text-shadow: 3px 3px 8px #1d423e;">Ik kom<br/>naar de partnerbijeenkomst<br/>op 15 oktober</h4>
                         </div>
                     </div>
                 </div>
