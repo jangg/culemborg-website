@@ -20,17 +20,17 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	$message .= 'Aantal peronen  : ' . $arr['am_aantal'] . '<br/><br/>';
 	$message .= "<br/><br/>" . 'Dank voor de aanmelding en tot donderdag 16 juni 15:00h';
 	$message .= "<br/><br/>" . 'Met vriendelijke groeten,';
-	$message .= "<br/>" . 'JobHulpMaatje Zoetermeer';
+	$message .= "<br/>" . LOC_NAME;
 
 	// error_log($message);
 	$name = $arr['am_voornaam'] . ' ' . $arr['am_tussenvoegsels'] . ' ' . $arr['am_achternaam'];
-	Tools::MailRoom($name, $arr['am_emailadres'], 'Aanmelding JobHulpMaatje Zoetermeer', $message);
+	Tools::MailRoom($name, $arr['am_emailadres'], 'Aanmelding ' . LOC_NAME, $message);
 	
 	/* Dan een email naar de coordinator */
 	
 	$message = 'Er is een nieuwe aanmelding voor de partnerbijeenkomst<br/><br/><br/>' . $message;
 	
-	Tools::MailRoom('Organisator', 'aanmelding@jobhulpmaatjezoetermeer.nl', 'Aanmelding Partnerbijeenkomst', $message);
+	Tools::MailRoom('Organisator', 'aanmelding@' . LOC_DOMAIN_PUB, 'Aanmelding Partnerbijeenkomst', $message);
 	
 	Tools::closeMailer();
 	// echo $wkz;

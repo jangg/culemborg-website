@@ -40,8 +40,8 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	Tools::MailRoom($name, $arr['am_emailadres'], 'Aanmelding Workshop door JobHulp Culemborg', $message);
 	
 	/* Dan een email naar de coordinator */	
-	$message = 'Er is een nieuwe aanmelding voor xxxxxxxxx binnengekomen via de website jobhulpmculemborg.nl<br/><br/><br/>' . $message;	
-	Tools::MailRoom('Coordinator', 'aanmelding@jobhulpculemborg.nl', 'Aanmelding xxxxxxxxxxxxxxxxxx', $message);
+	$message = 'Er is een nieuwe aanmelding voor de workshop binnengekomen via de website ' . LOC_DOMAIN_PUB . '<br/><br/><br/>' . $message;	
+	Tools::MailRoom('Coordinator', 'aanmelding@jobhulpculemborg.nl', 'Aanmelding Workshop ' . LOC_NAME, $message);
 	
 	Tools::closeMailer();
 	
