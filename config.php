@@ -13,7 +13,11 @@ function openDB ()
 	global $connection;
 	if (!is_a($connection, 'PDO'))
 	{
-		$connection = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'utf8mb4\'') );
+		// utf8mb4 via de DSN (charset=...) in plaats van PDO::MYSQL_ATTR_INIT_COMMAND:
+		// die constante is verouderd in PHP 8.5. Dit werkt in elke PHP-versie hetzelfde.
+		// Een eventuele andere charset in DB_DSN (bijv. utf8) wordt vervangen door utf8mb4.
+		$dsn = preg_replace('/;?charset=[^;]*/i', '', DB_DSN) . ';charset=utf8mb4';
+		$connection = new PDO( $dsn, DB_USERNAME, DB_PASSWORD );
 		$connection->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		// error_log('Het openen van de database lukt wel!');	
 	}
