@@ -155,6 +155,41 @@ class DocMap
 		return (int)$connection->lastInsertId();
 	}
 
+	/* Een submap met precies deze naam onder $parent, of null als die er niet is. */
+	public static function zoekKind (string $ruimte, ?int $eigenaar, ?int $parent, string $naam): ?int
+	{
+		global $connection;
+		$stmt = $connection->prepare("SELECT id FROM docmap WHERE ruimte = :r AND eigenaar_id <=> :e "
+			. "AND parent_id <=> :p AND naam = :n ORDER BY id LIMIT 1");
+		$stmt->execute([':r' => $ruimte, ':e' => $eigenaar, ':p' => $parent, ':n' => $naam]);
+		$id = $stmt->fetchColumn();
+		return $id === false ? null : (int)$id;
+	}
+
+	/* Voor het uploaden van een hele map. $pad is de plek van het bestand binnen
+	   die map, bijvoorbeeld "Cursus/2026/brief.pdf". Zorgt dat de mappen "Cursus"
+	   en "Cursus/2026" bestaan onder $parent (een map die al bestaat wordt
+	   hergebruikt, er komt geen tweede) en geeft het id van de map terug waar het
+	   bestand in hoort. Zonder mappen in het pad: gewoon $parent.
+	   $cache onthoudt binnen één verzoek welke mappen al zijn opgezocht. */
+	public static function maakPad (string $ruimte, ?int $eigenaar, ?int $parent, string $pad, int $door, array &$cache): ?int
+	{
+		$delen = explode('/', str_replace('\\', '/', $pad));
+		array_pop($delen);					// het laatste deel is de bestandsnaam
+		$map = $parent;
+		foreach (array_slice($delen, 0, 20) as $deel) {		// 20: noodrem tegen absurd diepe paden
+			$naam = self::schoneNaam($deel);
+			if ($naam === null || $naam === '.' || $naam === '..') continue;
+			$sleutel = ($map ?? 0) . '/' . mb_strtolower($naam);
+			if (!isset($cache[$sleutel])) {
+				$cache[$sleutel] = self::zoekKind($ruimte, $eigenaar, $map, $naam)
+					?? self::maak($ruimte, $eigenaar, $map, $naam, $door);
+			}
+			$map = $cache[$sleutel];
+		}
+		return $map;
+	}
+
 	public static function hernoem (int $id, string $naam): void
 	{
 		global $connection;
@@ -392,6 +427,19 @@ class Document
 		// opslagnaam is altijd 32 hex-tekens; controleer het toch, dan kan er nooit ../ in zitten
 		if ($map === null || !preg_match('/^[0-9a-f]{32}$/', (string)$doc['opslagnaam'])) return null;
 		return $map . $doc['opslagnaam'];
+	}
+
+	/* Een pad zoals de browser het meestuurt bij het uploaden van een map
+	   ("Cursus/2026/brief.pdf"), opgeschoond: elk deel een gewone naam,
+	   zonder lege delen, . of .. en hooguit 300 tekens. */
+	public static function schoonPad (string $pad): string
+	{
+		$delen = [];
+		foreach (explode('/', str_replace('\\', '/', $pad)) as $deel) {
+			$deel = DocMap::schoneNaam($deel);
+			if ($deel !== null && $deel !== '.' && $deel !== '..') $delen[] = $deel;
+		}
+		return mb_substr(implode('/', $delen), 0, 300);
 	}
 
 	/* Een veilige bestandsnaam: zonder map ervoor, zonder onzichtbare tekens of / \ : * ? " < > | */
