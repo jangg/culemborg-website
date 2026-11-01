@@ -15,26 +15,38 @@
  * Zo kan niemand een bestand via een webadres opvragen of raden, en
  * zitten twee bestanden met dezelfde naam elkaar nooit in de weg.
  *
- * Twee "ruimtes":
- *   'eigen'   persoonlijke documenten; eigenaar_id = user.id van de eigenaar
- *   'gedeeld' de gemeenschappelijke map; eigenaar_id = NULL
+ * "Ruimtes" (keuze van de organisaties, nov 2026: optie A + C):
+ *   'gedeeld'      A: de gemeenschappelijke map van de coördinatoren; eigenaar_id = NULL
+ *   'werkzoekende' C: de documenten van één werkzoekende; eigenaar_id = werkzkd.id
+ *   'eigen'        B: persoonlijke documenten (niet gekozen; wordt niet meer getoond,
+ *                  staat nog in de database voor documenten uit de testperiode)
  *
- * WIE WAT MAG, staat in Document::magZien() en Document::magVerwijderen()
- * (en de rechten documenten_eigen / documenten_gedeeld in includes/rechten.php).
- * De pagina's vragen het altijd hier na, zodat de regels op één plek staan.
+ * WIE WAT MAG, staat in Document::magRuimte() en Document::magWijzigen()
+ * (en de rechten documenten, documenten_gedeeld en documenten_werkzoekenden
+ * in includes/rechten.php). De pagina's vragen het altijd hier na, zodat de
+ * regels op één plek staan.
+ *
+ * Deze classes lezen en schrijven alleen hun eigen tabellen (document,
+ * docmap, instelling). Gegevens van werkzoekenden, maatjes en gebruikers
+ * komen via de classes Werkzoekende, Werkzoekende_coll, Maatje en User.
  *
  * Alle methodes zijn "static": je roept ze aan als Document::zoek(12),
  * zonder eerst een object te maken. Een document of map is gewoon een
  * array met de kolommen uit de database, bijvoorbeeld $doc['naam'].
  * ------------------------------------------------------------------ */
+include_once __DIR__ . '/c_user.php';
+include_once __DIR__ . '/c_maatje.php';
+include_once __DIR__ . '/c_werkzoekende.php';
+include_once __DIR__ . '/c_werkzoekende_coll.php';
 
 class Instelling
 {
 	/* Standaardwaarden, voor als de tabel (nog) leeg is. */
 	const STANDAARD = [
-		'doc_extensies' => 'pdf,doc,docx,xls,xlsx,ppt,pptx,odt,ods,txt,rtf,jpg,jpeg,png',
-		'doc_max_mb'    => '10',
-		'doc_quotum_mb' => '200',
+		'doc_extensies'  => 'pdf,doc,docx,xls,xlsx,ppt,pptx,odt,ods,txt,rtf,jpg,jpeg,png',
+		'doc_max_mb'     => '10',
+		'doc_quotum_mb'  => '100',		// per persoon: wat iemand bij werkzoekenden toevoegt
+		'doc_gedeeld_mb' => '4096',		// de gedeelde map in totaal (4 GB)
 	];
 
 	/* Deze soorten komen er NOOIT in, ook niet als de beheerder ze invult:
@@ -84,9 +96,16 @@ class Instelling
 		return min($beheerder, self::phpMaxBytes());
 	}
 
+	/* Maximum per persoon: alles wat iemand bij werkzoekenden heeft toegevoegd. */
 	public static function quotumBytes (): int
 	{
 		return (int)(floatval(self::get('doc_quotum_mb')) * 1024 * 1024);
+	}
+
+	/* Maximum voor de gedeelde map, alle documenten samen. */
+	public static function gedeeldBytes (): int
+	{
+		return (int)(floatval(self::get('doc_gedeeld_mb')) * 1024 * 1024);
 	}
 
 	/* Wat PHP op deze server maximaal accepteert (upload_max_filesize en post_max_size). */
@@ -234,11 +253,9 @@ class Document
 	public static function lijst (string $ruimte, ?int $eigenaar, ?int $map): array
 	{
 		global $connection;
-		$stmt = $connection->prepare("SELECT d.*, TRIM(CONCAT_WS(' ', p.voornaam, p.tussenvoegsels, p.achternaam)) AS door_naam "
-			. "FROM document d LEFT JOIN user u ON u.id = d.gemaakt_door LEFT JOIN person p ON p.person_id = u.id_person "
-			. "WHERE d.ruimte = :r AND d.eigenaar_id <=> :e AND d.map_id <=> :m ORDER BY d.naam");
+		$stmt = $connection->prepare("SELECT * FROM document WHERE ruimte = :r AND eigenaar_id <=> :e AND map_id <=> :m ORDER BY naam");
 		$stmt->execute([':r' => $ruimte, ':e' => $eigenaar, ':m' => $map]);
-		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		return self::metNamen($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 
 	/* Zoeken op naam in een hele ruimte (alle mappen). */
@@ -247,45 +264,142 @@ class Document
 		global $connection;
 		// % en _ hebben in LIKE een speciale betekenis; met een \ ervoor zoeken we ze letterlijk
 		$tekst = '%' . addcslashes($tekst, '%_\\') . '%';
-		$stmt = $connection->prepare("SELECT d.*, TRIM(CONCAT_WS(' ', p.voornaam, p.tussenvoegsels, p.achternaam)) AS door_naam "
-			. "FROM document d LEFT JOIN user u ON u.id = d.gemaakt_door LEFT JOIN person p ON p.person_id = u.id_person "
-			. "WHERE d.ruimte = :r AND d.eigenaar_id <=> :e AND d.naam LIKE :t ORDER BY d.naam LIMIT 200");
+		$stmt = $connection->prepare("SELECT * FROM document WHERE ruimte = :r AND eigenaar_id <=> :e AND naam LIKE :t ORDER BY naam LIMIT 200");
 		$stmt->execute([':r' => $ruimte, ':e' => $eigenaar, ':t' => $tekst]);
-		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		return self::metNamen($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 
-	/* Hoeveel bytes iemand in totaal heeft geüpload (eigen + gedeeld). */
+	/* Zet bij elk document de naam van wie het heeft toegevoegd (door_naam).
+	   Via de class User, met 'histid' zodat ook iemand die als verwijderd is
+	   gemarkeerd nog een naam heeft. Per persoon maar één keer opzoeken. */
+	private static function metNamen (array $docs): array
+	{
+		static $namen = [];
+		foreach ($docs as &$d) {
+			$u = (int)$d['gemaakt_door'];
+			if (!isset($namen[$u])) {
+				$user = new User('histid', $u);
+				$namen[$u] = $user->id ? self::naamVan($user) : '';
+			}
+			$d['door_naam'] = $namen[$u];
+		}
+		unset($d);		// na foreach met & altijd de verwijzing opheffen
+		return $docs;
+	}
+
+	/* Hoeveel bytes iemand bij werkzoekenden heeft toegevoegd (de gedeelde map telt
+	   niet mee; die heeft een eigen maximum). Voor het maximum per persoon. */
 	public static function gebruikt (int $userId): int
 	{
 		global $connection;
-		$stmt = $connection->prepare("SELECT COALESCE(SUM(grootte), 0) FROM document WHERE gemaakt_door = :u");
+		$stmt = $connection->prepare("SELECT COALESCE(SUM(grootte), 0) FROM document WHERE gemaakt_door = :u AND ruimte <> 'gedeeld'");
 		$stmt->execute([':u' => $userId]);
 		return (int)$stmt->fetchColumn();
+	}
+
+	/* Hoeveel bytes de gedeelde map in totaal gebruikt. */
+	public static function gebruiktGedeeld (): int
+	{
+		global $connection;
+		return (int)$connection->query("SELECT COALESCE(SUM(grootte), 0) FROM document WHERE ruimte = 'gedeeld'")->fetchColumn();
+	}
+
+	/* Per werkzoekende het aantal documenten: [werkzkd.id => aantal]. */
+	public static function aantallenPerWerkzoekende (): array
+	{
+		global $connection;
+		$rijen = $connection->query("SELECT eigenaar_id, COUNT(*) FROM document WHERE ruimte = 'werkzoekende' GROUP BY eigenaar_id")
+			->fetchAll(PDO::FETCH_NUM);
+		$aantallen = [];
+		foreach ($rijen as [$id, $n]) $aantallen[(int)$id] = (int)$n;
+		return $aantallen;
+	}
+
+	/* ----------------------------------------------------------
+	 * Werkzoekenden (optie C)
+	 * ---------------------------------------------------------- */
+
+	/* Het id van het maatje dat deze gebruiker is, of null als hij geen maatje is.
+	   Gebruiker en maatje zijn dezelfde persoon (zelfde id_person). */
+	public static function maatjeIdVan (int $userId): ?int
+	{
+		static $cache = [];
+		if (!array_key_exists($userId, $cache)) {
+			$user = new User('id', $userId);
+			$mtj  = $user->id ? new Maatje('id_person', $user->id_person) : null;
+			$cache[$userId] = ($mtj && $mtj->id) ? (int)$mtj->id : null;
+		}
+		return $cache[$userId];
+	}
+
+	/* De werkzoekende met dit werkzkd.id, of null als die niet (meer) bestaat.
+	   Werkzoekende('id') vindt alleen werkzoekenden die niet als verwijderd
+	   zijn gemarkeerd. */
+	public static function werkzoekende (?int $wzkId): ?Werkzoekende
+	{
+		static $cache = [];
+		if (!$wzkId) return null;
+		if (!array_key_exists($wzkId, $cache)) {
+			$wzk = new Werkzoekende('id', $wzkId);
+			$cache[$wzkId] = $wzk->id ? $wzk : null;
+		}
+		return $cache[$wzkId];
+	}
+
+	/* De werkzoekenden die deze gebruiker in Documenten ziet, op achternaam:
+	   de beheerder en coördinatoren (recht documenten_werkzoekenden) alle,
+	   een maatje alleen de zijne. */
+	public static function werkzoekendenVoor (int $userId): array
+	{
+		$volgorde = [['person.achternaam', 'ASC']];
+		if (heeft_recht('beheerder') || heeft_recht('documenten_werkzoekenden')) {
+			$coll = new Werkzoekende_coll([], $volgorde);
+		} else {
+			$mtjId = self::maatjeIdVan($userId);
+			if ($mtjId === null) return [];
+			$coll = new Werkzoekende_coll([['werkzkd.id_maatje', $mtjId]], $volgorde);
+		}
+		return $coll->werkzoekendeColl;
+	}
+
+	/* "Voornaam tussenvoegsels Achternaam" van een User, Maatje of Werkzoekende. */
+	public static function naamVan (object $p): string
+	{
+		return trim(preg_replace('/\s+/', ' ', $p->voornaam . ' ' . $p->tussenvoegsels . ' ' . $p->achternaam));
 	}
 
 	/* ----------------------------------------------------------
 	 * Wie mag wat
 	 * ---------------------------------------------------------- */
 
-	/* Mag deze gebruiker in deze ruimte kijken (en dus ook uploaden en mappen maken)? */
+	/* Mag deze gebruiker in deze ruimte kijken (en dus ook uploaden en mappen maken)?
+	   gedeeld:      recht documenten_gedeeld (coördinatoren)
+	   werkzoekende: de werkzoekende moet bestaan; dan de coördinatoren (recht
+	                 documenten_werkzoekenden) en het maatje van die werkzoekende
+	   eigen:        niet meer in gebruik; alleen de beheerder
+	   De beheerder mag overal. */
 	public static function magRuimte (string $ruimte, ?int $eigenaar, int $userId): bool
 	{
+		if ($ruimte === 'werkzoekende') {
+			$wzk = self::werkzoekende($eigenaar);
+			if ($wzk === null) return false;
+			if (heeft_recht('beheerder') || heeft_recht('documenten_werkzoekenden')) return true;
+			$mtjId = self::maatjeIdVan($userId);
+			return $mtjId !== null && (int)$wzk->id_maatje === $mtjId;
+		}
 		if (heeft_recht('beheerder')) return true;
-		if ($ruimte === 'eigen')   return heeft_recht('documenten_eigen') && $eigenaar === $userId;
 		if ($ruimte === 'gedeeld') return heeft_recht('documenten_gedeeld');
 		return false;
 	}
 
 	/* Mag deze gebruiker dit document (of deze map) verwijderen of hernoemen?
-	   In de eigen ruimte: de eigenaar. In de gedeelde map: alleen wie het heeft
-	   gemaakt. De beheerder altijd. */
+	   Alleen wie het heeft gemaakt (zolang hij er nog bij mag), en de beheerder altijd.
+	   Een nieuw maatje kan dus de documenten van zijn voorganger lezen, maar niet weggooien. */
 	public static function magWijzigen (array $item, int $userId): bool
 	{
 		if (heeft_recht('beheerder')) return true;
-		if ($item['ruimte'] === 'eigen') {
-			return heeft_recht('documenten_eigen') && (int)$item['eigenaar_id'] === $userId;
-		}
-		return heeft_recht('documenten_gedeeld') && (int)$item['gemaakt_door'] === $userId;
+		$eigenaar = $item['eigenaar_id'] === null ? null : (int)$item['eigenaar_id'];
+		return (int)$item['gemaakt_door'] === $userId && self::magRuimte($item['ruimte'], $eigenaar, $userId);
 	}
 
 	/* ----------------------------------------------------------
@@ -332,7 +446,14 @@ class Document
 		if ($grootte > Instelling::maxBytes()) {
 			return "$toon is te groot (" . self::mb($grootte) . '). Het maximum is ' . self::mb(Instelling::maxBytes()) . '.';
 		}
-		if (!heeft_recht('beheerder') && self::gebruikt($door) + $grootte > Instelling::quotumBytes()) {
+		if ($ruimte === 'gedeeld') {
+			// De gedeelde map heeft één maximum voor alle documenten samen (ook voor de beheerder)
+			$inGebruik = self::gebruiktGedeeld();
+			if ($inGebruik + $grootte > Instelling::gedeeldBytes()) {
+				return "$toon past er niet meer bij: de gedeelde map is vol (" . self::mb($inGebruik) . ' van de '
+					. self::mb(Instelling::gedeeldBytes()) . '). Verwijder eerst iets of vraag de beheerder om meer ruimte.';
+			}
+		} elseif (!heeft_recht('beheerder') && self::gebruikt($door) + $grootte > Instelling::quotumBytes()) {
 			return "$toon past er niet meer bij: je hebt al " . self::mb(self::gebruikt($door)) . ' van de '
 				. self::mb(Instelling::quotumBytes()) . ' in gebruik. Verwijder eerst iets wat je niet meer nodig hebt.';
 		}
@@ -460,6 +581,7 @@ class Document
 	public static function mb (int $bytes): string
 	{
 		if ($bytes >= 1024 * 1024 * 1024 * 1024) return 'onbeperkt';
+		if ($bytes >= 1024 * 1024 * 1024) return number_format($bytes / 1024 / 1024 / 1024, 1, ',', '.') . ' GB';
 		if ($bytes < 1024 * 1024) return max(1, (int)round($bytes / 1024)) . ' kB';
 		return number_format($bytes / 1024 / 1024, 1, ',', '.') . ' MB';
 	}
@@ -482,40 +604,44 @@ class Document
 	 * Voor de beheerder
 	 * ---------------------------------------------------------- */
 
-	/* Per gebruiker: aantal documenten en totale grootte (ook gebruikers die niet meer bestaan). */
-	public static function overzichtPerGebruiker (): array
+	/* Aantal documenten van één eigenaar in een ruimte (bijv. van één werkzoekende). */
+	public static function aantal (string $ruimte, ?int $eigenaar): int
 	{
 		global $connection;
-		$sql = "SELECT d.eigenaar_id AS id, u.username, TRIM(CONCAT_WS(' ', p.voornaam, p.tussenvoegsels, p.achternaam)) AS naam, "
-			. "COUNT(*) AS aantal, SUM(d.grootte) AS grootte, (u.id IS NULL) AS weg "
-			. "FROM document d LEFT JOIN user u ON u.id = d.eigenaar_id LEFT JOIN person p ON p.person_id = u.id_person "
-			. "WHERE d.ruimte = 'eigen' GROUP BY d.eigenaar_id, u.username, naam, weg ORDER BY weg DESC, naam";
-		return $connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+		$stmt = $connection->prepare("SELECT COUNT(*) FROM document WHERE ruimte = :r AND eigenaar_id <=> :e");
+		$stmt->execute([':r' => $ruimte, ':e' => $eigenaar]);
+		return (int)$stmt->fetchColumn();
 	}
 
-	/* Alle eigen mappen en documenten van $vanId verhuizen naar de eigen ruimte van $naarId,
-	   in een nieuwe map "Van <naam>". Bedoeld voor een maatje dat stopt. */
-	public static function verhuisNaar (int $vanId, int $naarId, string $mapnaam): void
+	/* Alle documenten (regels én bestanden) en mappen van één eigenaar in een ruimte
+	   verwijderen. Voor als een werkzoekende definitief wordt verwijderd
+	   (maintenance/cleanDB.php). Geeft het aantal verwijderde documenten terug. */
+	public static function verwijderAllesVan (string $ruimte, int $eigenaar): int
 	{
 		global $connection;
-		$connection->beginTransaction();	// alles of niets
-		try {
-			$nieuw = DocMap::maak('eigen', $naarId, null, $mapnaam, $naarId);
-			// mappen en documenten op het bovenste niveau komen in de nieuwe map
-			$connection->prepare("UPDATE docmap SET parent_id = :n WHERE ruimte = 'eigen' AND eigenaar_id = :v AND parent_id IS NULL")
-				->execute([':n' => $nieuw, ':v' => $vanId]);
-			$connection->prepare("UPDATE document SET map_id = :n WHERE ruimte = 'eigen' AND eigenaar_id = :v AND map_id IS NULL")
-				->execute([':n' => $nieuw, ':v' => $vanId]);
-			// en alles krijgt de nieuwe eigenaar
-			$connection->prepare("UPDATE docmap SET eigenaar_id = :n WHERE ruimte = 'eigen' AND eigenaar_id = :v")
-				->execute([':n' => $naarId, ':v' => $vanId]);
-			$connection->prepare("UPDATE document SET eigenaar_id = :n WHERE ruimte = 'eigen' AND eigenaar_id = :v")
-				->execute([':n' => $naarId, ':v' => $vanId]);
-			$connection->commit();
-		} catch (PDOException $e) {
-			$connection->rollBack();
-			throw $e;
+		$stmt = $connection->prepare("SELECT * FROM document WHERE ruimte = :r AND eigenaar_id = :e");
+		$stmt->execute([':r' => $ruimte, ':e' => $eigenaar]);
+		$docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($docs as $doc) {
+			self::verwijder($doc);		// regel en bestand
 		}
+		$connection->prepare("DELETE FROM docmap WHERE ruimte = :r AND eigenaar_id = :e")
+			->execute([':r' => $ruimte, ':e' => $eigenaar]);
+		return count($docs);
+	}
+
+	/* Werkzoekenden die niet meer bestaan (ook niet als "verwijderd" gemarkeerd),
+	   maar nog wel documenten hebben: [werkzkd.id => aantal]. Dat kan alleen als
+	   iemand buiten cleanDB.php om is verwijderd, bijvoorbeeld in phpMyAdmin. */
+	public static function wezen (): array
+	{
+		$wezen = [];
+		$zoeker = new Werkzoekende();
+		foreach (self::aantallenPerWerkzoekende() as $id => $n) {
+			// readAllWerkzoekendeWithId: ook werkzoekenden met delind = 'j'
+			if (!$zoeker->readAllWerkzoekendeWithId($id)) $wezen[$id] = $n;
+		}
+		return $wezen;
 	}
 
 	/* Controle: bestanden zonder regel in de database, en regels zonder bestand. */

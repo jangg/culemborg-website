@@ -69,7 +69,10 @@ class Maatje extends Person
 				break;
 			case 'emailadres':
 				$this->__construct1($this->readMaatjeWithEmailadres($value));
-				break;				
+				break;
+			case 'id_person':	// nov 2026: het maatje bij een gebruiker (user.id_person), voor de documentenfunctie
+				$this->__construct1($this->readMaatjeWithIdPerson($value));
+				break;
 			default:
 				return FALSE;
 		}
@@ -132,7 +135,28 @@ class Maatje extends Person
 			  error_log('Connectie (maatje 3) met de database mislukt: ' . $e->getMessage());
 			  return FALSE;
 		}
-		return $maatjerow;	
+		return $maatjerow;
+	}
+
+	public function readMaatjeWithIdPerson ($attr)
+	{
+		global $connection;
+		try
+		{
+			openDB();
+			$sql = "SELECT maatje.*, person.* FROM maatje JOIN person ON maatje.id_person = person.person_id WHERE maatje.id_person = :id_person AND person.delind = 'n' LIMIT 1;";
+
+			$stmt = $connection->prepare( $sql );
+			$stmt->bindValue( ":id_person", $attr, PDO::PARAM_INT);
+			$stmt->execute();
+			$maatjerow = $stmt->fetch(PDO::FETCH_ASSOC);
+		}
+		catch (PDOException $e)
+		{
+			  error_log('Connectie (maatje 4) met de database mislukt: ' . $e->getMessage());
+			  return FALSE;
+		}
+		return $maatjerow;
 	}
 	
 	public function saveToDB () 
