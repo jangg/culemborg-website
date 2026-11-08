@@ -1,12 +1,13 @@
 User-agent: *
 Allow: /
 
-# Admin en besloten mappen niet indexeren
-Disallow: /assets/
+# Interne mappen niet bezoeken.
+# /assets/ staat hier bewust NIET: daar staan de css en de foto's,
+# die Google nodig heeft om de pagina's goed te kunnen beoordelen.
 Disallow: /class/
 Disallow: /includes/
 Disallow: /logs/
-Disallow: /PHPmailer/
+Disallow: /PHPMailer/
 
 # Sitemap locatie doorgeven aan Google
 Sitemap: https://jobhulpculemborg.nl/sitemap.xml
