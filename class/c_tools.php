@@ -346,6 +346,10 @@ class Tools
 					$tmpdate = DateTime::createFromFormat('Y-m-d', $date);
 				}
 			}
+			// nov 2026: geen (geldige) datum herkend, bijv. '31-12-2026' of '2026-02-30':
+			// dan is er niets om op te maken. Zonder deze regel stopte de pagina met
+			// een fatale fout ($tmpdate->format() op niets).
+			if (!isset($tmpdate) || !($tmpdate instanceof DateTime)) return $tmpdate2;
 			
 			switch ($par)
 			{
@@ -601,8 +605,11 @@ class Tools
 
 	public static function getKey($key)
 	{
-		$keyrecord = new Keyrecord('sleutel', $key);
-		return $keyrecord->waarde;
+		// nov 2026: Keyrecord wil tegenwoordig de PDO-verbinding (zoals overal Keyrecord::fromSleutel)
+		global $connection;
+		openDB();
+		$keyrecord = Keyrecord::fromSleutel($connection, $key);
+		return $keyrecord ? $keyrecord->getWaarde() : '';
 	}
 }
 
