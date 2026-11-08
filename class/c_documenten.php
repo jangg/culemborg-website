@@ -582,6 +582,7 @@ class Document
 	{
 		if ($bytes >= 1024 * 1024 * 1024 * 1024) return 'onbeperkt';
 		if ($bytes >= 1024 * 1024 * 1024) return number_format($bytes / 1024 / 1024 / 1024, 1, ',', '.') . ' GB';
+		if ($bytes <= 0) return '0 kB';		// nov 2026: een lege map toonde "1 kB"
 		if ($bytes < 1024 * 1024) return max(1, (int)round($bytes / 1024)) . ' kB';
 		return number_format($bytes / 1024 / 1024, 1, ',', '.') . ' MB';
 	}
