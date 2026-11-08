@@ -70,7 +70,7 @@ class Opmerking
 		'$this->dt_opmerking 	: ' . $this->dt_opmerking .
 		'$this->opmerking : ' . $this->opmerking;
 	}
-	protected function readProcesstapWithId ($id)
+	protected function readOpmerkingWithId ($id)
 	{
 		/* Haal de gegevens uit de database
 		$userid kan 2 soorten waarde hebben:
