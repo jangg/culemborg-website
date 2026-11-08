@@ -42,7 +42,7 @@ class Aantekening
 		switch ($attr)
 		{
 			case 'id':
-			$this->__construct1($this->readTopicWithId($value));
+			$this->__construct1($this->readAantekeningWithId($value));
 			break;
 			
 			default:
