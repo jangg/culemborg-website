@@ -41,41 +41,51 @@ define('SUCSTOR_VOORBEELD', false);
 $sucstorRows = [
     [
         'id'                  => 1,
-        'titel'               => 'Hilde - "Samen kom je verder"',
+        'titel'               => 'Ruben – “Ik was op zoek naar gesprekken over werk en solliciteren en wilde er niet alleen voor staan”',
         'subtitel'            => '',
-        'tekst_samenvatting'  => 'Het motto “samen kom je verder” heeft mij doen besluiten om met JobGroep aan de slag te gaan.',
-        'tekst_kort'          => '<p>Door de JobGroep bijeenkomsten heb ik ook inzicht gekregen in wat ik belangrijk vind in mijn werk en het heeft mij geleerd om hulp te vragen. Het is mooi te ervaren dat mensen je graag willen helpen en wat een “netwerk” voor je kan doen.</p>'
-							   . '<p>JobGroep is hierdoor een echte aanrader. Je wordt op een persoonlijke manier begeleid die aansluit bij jou, door mensen die dit doen met veel passie! Dat maakt JobGroep bijzonder en zorgt het voor succes.</p>',
+        'tekst_samenvatting'  => 'Ik heb geleerd om (zelf)vertrouwen te houden dat het goed komt met het vinden van een baan',
+        'tekst_kort'          => '<p>Ik heb contact gehad met het UWV. Zij attendeerde mij op webinars en netwerkbijeenkomsten met werkgevers. Ik vond de aanpak van JobHulp veel persoonlijker.</p>
+        <p>JobHulp biedt een goede JobGroep cursus aan die je bewust laat nadenken over je kwaliteiten en mogelijkheden, netwerken en pitchen en daarnaast goede 1-op-1 gesprekken die je bewuster maken van wat je kunt en welke kansen er liggen en je daardoor meer zelfvertrouwen krijgt dan als je het alleen moet aanpakken. Absolute aanrader dus!</p>',
         'tekst_knop'          => '',
         'link_knop'           => '',
         'datetime_pub_extern' => '',
-        'picfile1'            => 'sucstor4.jpg',
+        'picfile1'            => 'sucstor7.jpg',
     ],
     [
         'id'                  => 2,
-        'titel'               => 'Rasa - "Een nieuwe start in Nederland"',
+        'titel'               => 'Annette – “Ik had 33 jaar niet hoeven te solliciteren en hoefde nooit te bedenken wat de top 3 van dingen is die belangrijk zijn in je nieuwe baan.”',
         'subtitel'            => '',
-        'tekst_samenvatting'  => 'De JobGroep hielp me ontdekken welk werk echt bij me past',
-        'tekst_kort'          => '<p>Om een lang verhaal kort te maken: ik schreef me in voor de cursus en begon samen met een leuke groep mensen acht weken lang te ontdekken 
-									wat we wilden doen in onze toekomst. Elke keer leerde ik veel over mezelf en anderen, maar ook over verschillende mentaliteiten en culturele aspecten.</p>'
-								 . ' <p>Met veel inspanning vond ik in de laatste week van de JobGroep een geweldige baan. De JobGroep heeft me geholpen te ontdekken welk werk echt bij me past en wat ik wil in mijn carrière. En deze baan is perfect, ik ben er ontzettend blij mee.</p>',
+        'tekst_samenvatting'  => 'Ik heb het meest gehad aan de handvatten die ik heb gekregen om weer een stukje bewuster te worden van mezelf',
+        'tekst_kort'          => '<p>JobHulp onderscheidt zich door de laagdrempeligheid. En dat er absoluut geen onderscheid wordt gemaakt tussen laag - of hoog opgeleid. Of allochtoon of autochtoon. Iedereen komt voor hetzelfde en iedereen helpt elkaar zo goed als mogelijk.</p>
+        <p>De mogelijkheid om ook nog te kiezen voor een JobMaatje is helemaal uniek. Want hoe fijn is het om te kunnen sparren, waardoor het niet als een verplichting voelt, maar als leuk, fijn en leerzaam.</p>
+        <p><strong>P.S. Annette is inmiddels zelf JobMaatje bij JobHulp!</b></strong>',
         'tekst_knop'          => '',
         'link_knop'           => '',
         'datetime_pub_extern' => '',
-        'picfile1'            => 'sucstor5.jpg',
+        'picfile1'            => 'sucstor8.jpg',
     ],
     [
         'id'                  => 3,
-        'titel'               => 'Angelique - "Met een maatje sta je sterker"',
+        'titel'               => 'Greta – “Werken is voor veel mensen een bestaansfundament. Die weg is niet altijd vanzelfsprekend. Juist dan is er JobHulp.”',
         'subtitel'            => '',
-        'tekst_samenvatting'  => 'Zonder mijn maatje had ik de handdoek al lang in de ring geworpen',
-        'tekst_kort'          => '<p>In eerste instantie dacht ik dat ik het allemaal wel alleen kon. Totdat mijn zoektocht naar een leuke nieuwe baan langer duurde 
-								dan ik zelf had verwacht. Ik zag de advertentie van JobHulp in de krant</p>'
-                               . '<p>Mijn JobMaatje heeft mij de handvaten aangereikt die ik nodig had om ervoor te zorgen dat ik bij een sollicitatie eruit zou springen. Dit deed zij door te luisteren en een vertaalslag te maken, mij inzicht te geven en te motiveren als het even tegenzat en vooral door er altijd te zijn en een luisterend oor te bieden. Dankjewel JobHulp voor het fantastisch werk wat jullie doen! Jullie inzet is ongekend</p>',
+        'tekst_samenvatting'  => 'Ik kon vooral mijzelf zijn en ontdekte wat voor baan en werkomgeving bij mij als mens past. Ik kon al mijn vragen stellen en support vinden bij mijn jobmaatje.',
+        'tekst_kort'          => '<p>In een arbeidsmarkt waar steeds meer draait om online formulieren en geautomatiseerde processen – en waar échte gesprekken vaak ontbreken – biedt JobHulp iets wat onbetaalbaar is: menselijkheid.</p>        
+        <p>Hier staat niet de “arbeidsmachine” centraal, maar de mens zelf. Vrijwilligers die luisteren, meedenken en je praktisch verder helpen met tips, tricks en echte gesprekken. Dáár zit het verschil. Waar andere organisaties vaak verdienen aan de zoektocht van werkzoekenden, kiest JobHulp ervoor om te geven. En dat maakt ze onmisbaar.</p>',
         'tekst_knop'          => '',
         'link_knop'           => '',
         'datetime_pub_extern' => '',
-        'picfile1'            => 'sucstor6.jpg',
+        'picfile1'            => 'sucstor9.jpeg',
+    ],
+    [
+        'id'                  => 4,
+        'titel'               => 'Suprita – “JobHulp is nuttig voor mensen die vanuit verschillende landen hierheen verhuizen”',
+        'subtitel'            => '',
+        'tekst_samenvatting'  => 'JobHulp organiseert persoonlijke sessies, ik kreeg de tijd om mijn cv aan te passen en het Job Maatje heeft advies gegeven over aanpassingen.',
+        'tekst_kort'          => '<p>Via Leerhuis kwam ik JobHulp tegen. Ik kreeg te horen dat een JobMaatje me zou begeleiden op de Nederlandse arbeidsmarkt en me zou informeren over de werkcultuur hier.</p><p>Mijn Jobmaatje motiveerde me om te solliciteren naar banen die bij mijn profiel pasten.</p>',
+        'tekst_knop'          => '',
+        'link_knop'           => '',
+        'datetime_pub_extern' => '',
+        'picfile1'            => 'sucstor10.jpg',
     ],
 ];
 
