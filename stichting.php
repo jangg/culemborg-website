@@ -65,6 +65,7 @@ require_once 'config.php';
             <ul style="text-align: left; font-size: 1.2em;">
               <li>Voorzitter: Dhr. Wim de Haas</li>
               <li>Secretaris: Mevr. Judith Tijdink</li>
+			  <li>Bestuurslid: Dhr. Gyan Akveld</li>
               <li>Bestuurslid: Dhr. Rien van der Veer</li>
               <li>Penningmeester: Mevr. Bojana Vasi&cacute;</li>  <!-- Vaci&ccedil; -->
             </ul>
