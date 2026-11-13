@@ -69,7 +69,10 @@ class Maatje extends Person
 				break;
 			case 'emailadres':
 				$this->__construct1($this->readMaatjeWithEmailadres($value));
-				break;				
+				break;
+			case 'id_person':	// nov 2026: het maatje bij een gebruiker (user.id_person), voor de documentenfunctie
+				$this->__construct1($this->readMaatjeWithIdPerson($value));
+				break;
 			default:
 				return FALSE;
 		}
@@ -132,9 +135,57 @@ class Maatje extends Person
 			  error_log('Connectie (maatje 3) met de database mislukt: ' . $e->getMessage());
 			  return FALSE;
 		}
-		return $maatjerow;	
+		return $maatjerow;
+	}
+
+	public function readMaatjeWithIdPerson ($attr)
+	{
+		global $connection;
+		try
+		{
+			openDB();
+			$sql = "SELECT maatje.*, person.* FROM maatje JOIN person ON maatje.id_person = person.person_id WHERE maatje.id_person = :id_person AND person.delind = 'n' LIMIT 1;";
+
+			$stmt = $connection->prepare( $sql );
+			$stmt->bindValue( ":id_person", $attr, PDO::PARAM_INT);
+			$stmt->execute();
+			$maatjerow = $stmt->fetch(PDO::FETCH_ASSOC);
+		}
+		catch (PDOException $e)
+		{
+			  error_log('Connectie (maatje 4) met de database mislukt: ' . $e->getMessage());
+			  return FALSE;
+		}
+		return $maatjerow;
 	}
 	
+	public static function zonderGebruiker (): array
+	{
+		/* Nov 2026, voor het Systeem-scherm: maatjes (niet verwijderd) die nog
+		   geen account hebben. Alleen zij kunnen een gebruiker worden.
+		   LEFT JOIN + "user.id IS NULL": neem elk maatje, en houd alleen de
+		   maatjes over waarbij geen user-regel is gevonden.
+		   Geeft een lijst van arrays met person_id, voornaam, tussenvoegsels,
+		   achternaam en emailadres. */
+		global $connection;
+		try
+		{
+			openDB();
+			$sql = "SELECT person.person_id, person.voornaam, person.tussenvoegsels, person.achternaam, person.emailadres
+					FROM maatje
+					JOIN person ON maatje.id_person = person.person_id
+					LEFT JOIN user ON user.id_person = maatje.id_person
+					WHERE person.delind = 'n' AND user.id IS NULL
+					ORDER BY person.achternaam, person.voornaam";
+			return $connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+		}
+		catch (PDOException $e)
+		{
+			error_log('Maatjes zonder account (maatje 5) mislukt: ' . $e->getMessage());
+			return [];
+		}
+	}
+
 	public function saveToDB () 
 	{
 		openDB();
