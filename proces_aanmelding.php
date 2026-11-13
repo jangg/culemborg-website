@@ -60,13 +60,14 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	$message .= 'Reden      :<br/>' . $arr['am_reden'] . '<br/><br/>';
 	$message .= 'Opmerkingen:<br/>' . $arr['am_opmerkingen'] . '<br/><br/>';
 	$message .= 'Je hebt je aangemeld voor de volgende optie(s):' . '<br/><br/>';
-	if ($arr['optie_mtj']) $message .= 'Persoonlijk begeleiding' . '<br/>';
-	if ($arr['optie_jg1']) $message .= 'Jobgroep' . '<br/>';
-	if ($arr['optie_jg2']) $message .= 'Jobgroep Ik Werk In Nederland' . '<br/>';
-	if ($arr['optie_jg3']) $message .= 'Jobgroep ZZP' . '<br/>';
-	if ($arr['optie_wks']) $message .= 'Workshop' . '<br/>';
-	if ($arr['optie_vrw']) $message .= 'Vrijwilliger bij JobHulp' . '<br/>';
-	if ($arr['optie_and']) $message .= 'Je weet het nog niet' . '<br/>';
+	// Dezelfde omschrijvingen als de aankruisvakjes in aanmelden.php (het formulier
+	// is leidend). Verandert daar een tekst, pas hem dan ook hier aan.
+	// optie5 (optie_wks) en optie6 (optie_vrw) staan niet meer op het formulier.
+	if ($arr['optie_mtj']) $message .= 'Individueel traject met een JobMaatje' . '<br/>';
+	if ($arr['optie_jg1']) $message .= 'Deelnemen aan een JobGroep' . '<br/>';
+	if ($arr['optie_jg2']) $message .= 'Deelnemen aan "Stap in vrijwilligerswerk"' . '<br/>';
+	if ($arr['optie_jg3']) $message .= 'Helpen als vrijwilliger' . '<br/>';
+	if ($arr['optie_and']) $message .= 'Iets anders' . '<br/>';
 	$message .= "<br/><br/>" . 'Wij zullen je aanmelding zo spoedig mogelijk verwerken en vervolgens contact met je opnemen.';
 	$message .= "<br/><br/>" . 'Met vriendelijke groeten,';
 	$message .= "<br/>" . 'JobHulp Culemborg';
