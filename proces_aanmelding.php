@@ -86,13 +86,16 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	Tools::closeMailer();	
 	
 	// error_log($message);
-	/*    
-	JobHulpMaatje       = ja ==> $opties +1
-	Jobgroup            = ja ==> $opties +2
-	JobGroupiWIN        = ja ==> $opties +4
-	JobGroupZZP         = ja ==> $opties +8
-	anders              = ja ==> $opties +16 
-	vrijwilliger  		  = ja ==> $opties +32
+	/*
+	De keuzes worden samen als een getal opgeslagen (werkzkd.opties); elke keuze
+	heeft zijn eigen waarde. Het intranet gebruikt dezelfde waarden en dezelfde
+	omschrijvingen (beheerwas/aanmelding_wkz.php, intake.php, intake_pdf.php).
+	  Individueel traject met een JobMaatje      +1
+	  Deelnemen aan een JobGroep                 +2
+	  Deelnemen aan "Stap in vrijwilligerswerk"  +4
+	  Helpen als vrijwilliger                    +8
+	  (16 en 32: staan niet meer op het formulier)
+	  Iets anders                                +64
 	*/  
 	$opties = 0;
 	if ($optie1 != '') $opties = $opties + 1;
@@ -101,7 +104,7 @@ if (isset($_POST['sendBut']) && $_POST['sendBut'] == 'sendForm')
 	if ($optie4 != '') $opties = $opties + 8;
 	if ($optie5 != '') $opties = $opties + 16;
 	if ($optie6 != '') $opties = $opties + 32;
-	if ($optie7 != '') $optie7 = $opties + 64;
+	if ($optie7 != '') $opties = $opties + 64;   // nov 2026: stond "$optie7 = ...", daardoor werd 'Iets anders' niet opgeslagen
 		
 	/*********
 	 /****  vanaf hier moet de aanmelding in de database worden gezet
