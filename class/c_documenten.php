@@ -776,6 +776,20 @@ class Document
 		return count($docs);
 	}
 
+	/* Alle documenten (regels én bestanden) en mappen uit de ruimte 'eigen' verwijderen
+	   (nov 2026). Dat zijn de persoonlijke documenten uit de testperiode (optie B, niet
+	   gekozen); er is geen scherm meer voor. Geeft het aantal verwijderde documenten terug. */
+	public static function verwijderEigen (): int
+	{
+		global $connection;
+		$docs = $connection->query("SELECT * FROM document WHERE ruimte = 'eigen'")->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($docs as $doc) {
+			self::verwijder($doc);		// regel en bestand
+		}
+		$connection->exec("DELETE FROM docmap WHERE ruimte = 'eigen'");
+		return count($docs);
+	}
+
 	/* Werkzoekenden die niet meer bestaan (ook niet als "verwijderd" gemarkeerd),
 	   maar nog wel documenten hebben: [werkzkd.id => aantal]. Dat kan alleen als
 	   iemand buiten cleanDB.php om is verwijderd, bijvoorbeeld in phpMyAdmin. */
