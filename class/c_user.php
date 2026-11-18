@@ -16,6 +16,7 @@ class User extends Person
 	protected $berichtSentInd;
 	protected $forumNoteInd;
 	protected $id_team;
+	protected $rechten;			// nov 2026: lijst van rechten uit user_recht; NULL = nog niet gelezen (zie rechten())
 	
 	public function __construct () 
 	{
@@ -33,6 +34,7 @@ class User extends Person
 		$this->berichtSentInd       = '';
 		$this->forumNoteInd	   ='';
 		$this->id_team = NULL;
+		$this->rechten = NULL;
 		parent::__construct ();	
 	
 		$a = func_get_args(); 
@@ -306,42 +308,170 @@ class User extends Person
 		$this->reset_expires = NULL;
 	}
 
-	public function isBeheerder ()
+	/* ------------------------------------------------------------------
+	 * Rechten (nov 2026)
+	 *
+	 * Elke gebruiker heeft een lijst van rechten in de tabel user_recht
+	 * (één regel per recht). Welke rechten er bestaan, staat in
+	 * includes/rechten.php. Pagina's vragen het na met heeft_recht('naam')
+	 * uit config.php; die gebruikt rechten() hieronder.
+	 * ------------------------------------------------------------------ */
+
+	/* Zolang de migratie (tabel user_recht) nog niet is gedraaid, gelden de
+	   oude niveaus uit user.beheerind. Dit is precies de omzetting uit
+	   migraties/2026-11-06_rechten-per-gebruiker_jhmz.sql.
+	   Kan weg zodra de migratie overal is gedraaid en beheerind is verwijderd. */
+	const NIVEAU_RECHTEN = [
+		'0' => [],
+		'1' => ['forum_lezen'],
+		'2' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen'],
+		'3' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'redactie'],
+		'4' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'was_lezen'],
+		'5' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'was_lezen', 'was_wijzigen', 'documenten_gedeeld', 'documenten_werkzoekenden'],
+		'6' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'was_lezen', 'was_wijzigen', 'documenten_gedeeld', 'documenten_werkzoekenden', 'maatjes_wijzigen', 'presentie_anderen'],
+		'7' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'redactie', 'was_lezen'],
+		'8' => ['forum_lezen', 'forum_schrijven', 'documenten_eigen', 'redactie', 'was_lezen', 'was_wijzigen', 'documenten_gedeeld', 'documenten_werkzoekenden'],
+		'9' => ['beheerder'],
+		'j' => ['beheerder'],
+	];
+
+	public function rechten (): array
 	{
-		/*
-		beheerind:
-			Welk niveau welk recht geeft, staat in includes/rechten.php
-			(gelijk voor beide sites).
-			Gebruik in pagina's heeft_recht('naam') / require_recht('naam') uit config.php,
-			niet het getal zelf.
-			Oude waarde 'j' telt als 9.
-		*/
-		if ($this->beheerind == 'j' || $this->beheerind == '9')
-		return TRUE;
-		else
-		return FALSE;
-	}
-	
-	public function authLevel ()
-	{
-		/*
-		beheerind:
-			Welk niveau welk recht geeft, staat in includes/rechten.php
-			(gelijk voor beide sites).
-			Gebruik in pagina's heeft_recht('naam') / require_recht('naam') uit config.php,
-			niet het getal zelf.
-			Oude waarde 'j' telt als 9.
-		*/
-		if (is_numeric($this->beheerind))
-			return $this->beheerind;
-		else
+		// De rechten van deze gebruiker, bijvoorbeeld ['forum_lezen', 'was_lezen'].
+		// Wordt één keer gelezen en daarna onthouden in $this->rechten.
+		if ($this->rechten === NULL)
 		{
-			if ($this->beheerind == 'j')
-				 return '9';
-			else return '0';
+			$this->rechten = [];
+			if ($this->id)
+			{
+				global $connection;
+				try
+				{
+					openDB();
+					$stmt = $connection->prepare("SELECT recht FROM user_recht WHERE user_id = :id ORDER BY recht");
+					$stmt->execute([':id' => $this->id]);
+					// FETCH_COLUMN: alleen de eerste kolom, als gewone lijst
+					$this->rechten = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				}
+				catch (PDOException $e)
+				{
+					// Meestal: de tabel user_recht bestaat (nog) niet. Dan de oude niveaus.
+					error_log('Rechten (user 7): user_recht niet leesbaar, beheerind gebruikt: ' . $e->getMessage());
+					$this->rechten = self::NIVEAU_RECHTEN[(string)$this->beheerind] ?? [];
+				}
+			}
+		}
+		return $this->rechten;
+	}
+
+	public function isBeheerder (): bool
+	{
+		return in_array('beheerder', $this->rechten(), true);
+	}
+
+	public function slaRechtenOp (array $rechten): bool
+	{
+		/* Vervangt alle rechten van deze gebruiker door $rechten.
+		   Een transactie zorgt dat het in één keer gebeurt: lukt het
+		   toevoegen niet, dan wordt ook het verwijderen teruggedraaid
+		   (rollBack) en houdt de gebruiker zijn oude rechten.
+		   Controle op wat wel en niet mag, gebeurt in systeem.php. */
+		global $connection;
+		$rechten = array_values(array_unique($rechten));
+		try
+		{
+			openDB();
+			$connection->beginTransaction();
+			$connection->prepare("DELETE FROM user_recht WHERE user_id = :id")->execute([':id' => $this->id]);
+			$stmt = $connection->prepare("INSERT INTO user_recht (user_id, recht) VALUES (:id, :recht)");
+			foreach ($rechten as $recht)
+				$stmt->execute([':id' => $this->id, ':recht' => $recht]);
+			$connection->commit();
+		}
+		catch (PDOException $e)
+		{
+			if ($connection->inTransaction()) $connection->rollBack();
+			error_log('Rechten opslaan (user 8) mislukt: ' . $e->getMessage());
+			return FALSE;
+		}
+		sort($rechten);
+		$this->rechten = $rechten;
+		return TRUE;
+	}
+
+	/* ------------------------------------------------------------------
+	 * Voor het Systeem-scherm (systeem.php, nov 2026)
+	 * ------------------------------------------------------------------ */
+
+	public static function usernameBestaat (string $username): bool
+	{
+		// Ook geblokkeerde gebruikers tellen mee: een inlognaam is uniek in de tabel.
+		global $connection;
+		openDB();
+		$stmt = $connection->prepare("SELECT COUNT(*) FROM user WHERE username = :u");
+		$stmt->execute([':u' => $username]);
+		return (int)$stmt->fetchColumn() > 0;
+	}
+
+	public static function maak (int $idPerson, string $username, string $wachtwoord): ?int
+	{
+		/* Nieuwe gebruiker voor een bestaand maatje (person_id).
+		   Het wachtwoord wordt meteen als hash opgeslagen; password_mod = 'j'
+		   zorgt dat hij het bij de eerste keer inloggen zelf moet wijzigen.
+		   activity is verplicht in de tabel; we vullen het moment van aanmaken in.
+		   Geeft het nieuwe user.id terug, of NULL als het niet lukte. */
+		global $connection;
+		try
+		{
+			openDB();
+			$sql = "INSERT INTO user (id_person, username, password, password_hash, password_mod, activity,
+							beheerind, berichtInd, berichtSentInd, forumNoteInd, id_team)
+					VALUES (:id_person, :username, '', :hash, 'j', :nu, '0', 'n', 'n', 'n', 0)";
+			$stmt = $connection->prepare($sql);
+			$stmt->execute([
+				':id_person' => $idPerson,
+				':username'  => $username,
+				':hash'      => password_hash($wachtwoord, PASSWORD_DEFAULT),
+				':nu'        => date('Y-m-d H:i:s'),
+			]);
+			return (int)$connection->lastInsertId();
+		}
+		catch (PDOException $e)
+		{
+			error_log('Gebruiker aanmaken (user 9) mislukt: ' . $e->getMessage());
+			return NULL;
 		}
 	}
-	
+
+	public static function lijstSysteem (): array
+	{
+		/* Alle gebruikers, ook de geblokkeerde (person.delind = 'j'), op achternaam.
+		   Per gebruiker een array met de kolommen uit user en person, plus
+		   'rechten' (een lijst). GROUP_CONCAT plakt de rechten in één query
+		   aan elkaar ("forum_lezen,was_lezen"); explode() maakt er weer een lijst van. */
+		global $connection;
+		openDB();
+		try
+		{
+			$sql = "SELECT user.id, user.username, user.activity, user.password_mod, user.berichtInd, user.forumNoteInd,
+						user.beheerind, person.person_id, person.voornaam, person.tussenvoegsels, person.achternaam,
+						person.emailadres, person.delind,
+						(SELECT GROUP_CONCAT(r.recht ORDER BY r.recht) FROM user_recht r WHERE r.user_id = user.id) AS rechten
+					FROM user JOIN person ON user.id_person = person.person_id
+					ORDER BY (person.delind = 'n') DESC, person.achternaam, person.voornaam";
+			$rows = $connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+			foreach ($rows as &$row)
+				$row['rechten'] = $row['rechten'] === NULL ? [] : explode(',', $row['rechten']);
+			unset($row);	// de verwijzing (&) opheffen, anders kan een volgende foreach $rows beschadigen
+		}
+		catch (PDOException $e)
+		{
+			error_log('Gebruikerslijst (user 10) mislukt: ' . $e->getMessage());
+			return [];
+		}
+		return $rows;
+	}
+
 	public function mustChangePassword()
 	{
 		if ($this->password_mod == 'j')
